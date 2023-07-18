@@ -2,13 +2,9 @@ import * as express from "express";
 import cors = require("cors");
 import helmet from "helmet";
 import "reflect-metadata";
-import { Request, Respone } from "express";
 import { AppDataSource } from "./data-source";
 import { Routes } from "./routes";
-import { Tipo_Vehiculo } from "./entity/Tipo_Vehiculo";
-import { Marca } from "./entity/Marca";
-import { Color } from "./entity/Color";
-import { Vehiculo } from "./entity/Vehiculo";
+
 
 AppDataSource.initialize()
   .then(async () => {

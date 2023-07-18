@@ -27,29 +27,29 @@ class VehiculoController {
   static getById = async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params["id"]);
-
+  
       if (!id) {
         return res.status(404).json({ mensaje: "No se indica el ID" });
       }
-
+  
       const vehiculosRepo = AppDataSource.getRepository(Vehiculo);
-
+  
       let vehiculo;
       try {
         vehiculo = await vehiculosRepo.findOneOrFail({
           where: { id, estado: true },
+          relations: ["id_tipoVehiculo", "id_marca", "id_color"],
         });
       } catch (error) {
-        return res
-          .status(404)
-          .json({ mensaje: "No hay un vehiculo con ese id" });
+        return res.status(404).json({ mensaje: "No hay un vehículo con ese ID" });
       }
-
+  
       return res.status(200).json(vehiculo);
     } catch (error) {
       return res.status(400).json({ mensaje: error });
     }
   };
+  
 
   static add = async (req: Request, res: Response) => {
     try {
@@ -60,22 +60,7 @@ class VehiculoController {
         cilindraje,
         id_color,
         cantidadPasajeros,
-        fecha_ingreso,
-        estado,
       } = req.body;
-  
-      // Validación de datos de entrada
-      if (!placa) {
-        return res.status(400).json({ mensaje: "Debe indicar la placa" });
-      }
-      if (!id_marca) {
-        return res.status(400).json({ mensaje: "Debe indicar el ID de la marca" });
-      }
-      if (!id_tipoVehiculo) {
-        return res
-          .status(400)
-          .json({ mensaje: "Debe indicar el ID del tipo de vehículo" });
-      }
   
       // Obtener los repositorios necesarios
       const vehiculosRepo = AppDataSource.getRepository(Vehiculo);
@@ -102,26 +87,20 @@ class VehiculoController {
       vehiculo.cilindraje = cilindraje;
       vehiculo.id_color = color;
       vehiculo.cantidadPasajeros = cantidadPasajeros;
-      vehiculo.fecha_ingreso = new Date(fecha_ingreso);
-      vehiculo.estado = estado;
+      vehiculo.fecha_ingreso = new Date(); // Establecer la fecha actual
+      vehiculo.estado = true; // Establecer el estado como true
   
-      console.log(vehiculo); // Verificar los valores del objeto vehiculo
-  
-      // Validar con class-validator
-      const errors = await validate(vehiculo, {
-        validationError: { target: false, value: false },
-      });
-  
-      if (errors.length > 0) {
-        return res.status(400).json(errors);
-      }
-  
+      // Guardar el vehículo en la base de datos
       await vehiculosRepo.save(vehiculo);
+  
       return res.status(201).json({ mensaje: "Vehículo creado" });
     } catch (error) {
       return res.status(400).json({ mensaje: "Error al crear el vehículo" });
     }
   };
+  
+  
+  
   
   
 
